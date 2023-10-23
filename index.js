@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 // get all todos
-app.get('/todos', async (req, res) => {
+app.get('/api/todos', async (req, res) => {
     const todos = await db.todoList.findMany({
         include: {
             category: {
@@ -50,7 +50,7 @@ app.get('/todos', async (req, res) => {
 });
 
 // create todo
-app.post('/todos', async (req, res) => {
+app.post('/api/todos', async (req, res) => {
     const { title, description } = req.body;
 
     const todo = await db.todoList.create({
@@ -77,7 +77,7 @@ app.post('/todos', async (req, res) => {
 });
 
 // get todo by id
-app.get('/todos/:id', async (req, res) => {
+app.get('/api/todos/:id', async (req, res) => {
     const { id } = req.params;
 
     const todo = await db.todoList.findUnique({
@@ -118,7 +118,7 @@ app.get('/todos/:id', async (req, res) => {
 });
 
 // update todo
-app.put('/todos/:id', async (req, res) => {
+app.put('/api/todos/:id', async (req, res) => {
     const { id } = req.params;
     const { title, description } = req.body;
     
@@ -129,7 +129,16 @@ app.put('/todos/:id', async (req, res) => {
         data: {
             title,
             description
-        }
+        },
+        include: {
+            category: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            },
+            tasks: true
+        },
     });
 
     if (!todo) {
@@ -143,12 +152,19 @@ app.put('/todos/:id', async (req, res) => {
     res.status(200).send({
         status: 200,
         message: "Success: Todo updated.",
-        data: todo
+        data: {
+            id: todo.id,
+            title: todo.title,
+            description: todo.description,
+            category: todo.category,
+            completed: todo.tasks.length > 0 && todo.tasks.every(task => task.isCompleted),
+            tasks: todo.tasks
+        }
     });
 });
 
 // delete todo
-app.delete('/todos/:id', async (req, res) => {
+app.delete('/api/todos/:id', async (req, res) => {
     const { id } = req.params;
 
     const tasks = await db.task.deleteMany({
@@ -182,7 +198,7 @@ app.delete('/todos/:id', async (req, res) => {
 });
 
 // task
-app.post('/todos/:id/tasks', async (req, res) => {
+app.post('/api/todos/:id/tasks', async (req, res) => {
     const { id } = req.params;
     const { title } = req.body;
 
@@ -201,7 +217,7 @@ app.post('/todos/:id/tasks', async (req, res) => {
 });
 
 // update task
-app.patch('/todos/:id/tasks/:taskId', async (req, res) => {
+app.patch('/api/todos/:id/tasks/:taskId', async (req, res) => {
     const { id, taskId } = req.params;
 
     const taskCompleted = await db.task.findFirst({
@@ -239,7 +255,7 @@ app.patch('/todos/:id/tasks/:taskId', async (req, res) => {
 });
 
 // delete task
-app.delete('/todos/:id/tasks/:taskId', async (req, res) => {
+app.delete('/api/todos/:id/tasks/:taskId', async (req, res) => {
     const { id, taskId } = req.params;
 
     const task = await db.task.delete({
@@ -265,7 +281,7 @@ app.delete('/todos/:id/tasks/:taskId', async (req, res) => {
 });
 
 // category
-app.get('/category', async (req, res) => {
+app.get('/api/category', async (req, res) => {
     const category = await db.category.findMany();
 
     res.status(200).send({
@@ -276,7 +292,7 @@ app.get('/category', async (req, res) => {
 });
 
 // create category
-app.post('/category', async (req, res) => {
+app.post('/api/category', async (req, res) => {
     const { name } = req.body;
 
     const category = await db.category.create({
@@ -293,7 +309,7 @@ app.post('/category', async (req, res) => {
 });
 
 // get category by id
-app.get('/category/:id', async (req, res) => {
+app.get('/api/category/:id', async (req, res) => {
     const { id } = req.params;
 
     const category = await db.category.findUnique({
@@ -343,7 +359,7 @@ app.get('/category/:id', async (req, res) => {
 });
 
 // insert todo to category
-app.post('/category/:id', async (req, res) => {
+app.post('/api/category/:id', async (req, res) => {
     // insert todo to category
     const { id } = req.params;
     const { title, description } = req.body;
@@ -384,7 +400,7 @@ app.post('/category/:id', async (req, res) => {
 });
 
 // update todo to category
-app.put('/category/:id', async (req, res) => {
+app.put('/api/category/:id', async (req, res) => {
     // insert todo to category
     const { id } = req.params;
     const { todoId } = req.body;
@@ -432,7 +448,7 @@ app.put('/category/:id', async (req, res) => {
 });
 
 // delete todo to category
-app.patch('/category/:id', async (req, res) => {
+app.patch('/api/category/:id', async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
 
@@ -461,7 +477,7 @@ app.patch('/category/:id', async (req, res) => {
 });
 
 // delete category
-app.delete('/category/:id', async (req, res) => {
+app.delete('/api/category/:id', async (req, res) => {
     const { id } = req.params;
 
     const category = await db.category.delete({
@@ -485,4 +501,4 @@ app.delete('/category/:id', async (req, res) => {
     });
 });
 
-app.listen(8081, () => app.log(`Server is running on http://localhost:8080`));
+app.listen(8080, () => app.log(`Server is running on http://localhost:8080`));
