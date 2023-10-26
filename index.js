@@ -52,7 +52,6 @@ app.get('/api/todos', async (req, res) => {
 // create todo
 app.post('/api/todos', async (req, res) => {
     const { title, description } = req.body;
-
     const todo = await db.todoList.create({
         data: {
             title,
@@ -68,7 +67,6 @@ app.post('/api/todos', async (req, res) => {
             tasks: true
         }
     });
-
     res.status(200).send({
         status: 200,
         message: "Success: Todo created.",
@@ -79,7 +77,6 @@ app.post('/api/todos', async (req, res) => {
 // get todo by id
 app.get('/api/todos/:id', async (req, res) => {
     const { id } = req.params;
-
     const todo = await db.todoList.findUnique({
         where: {
             id: parseInt(id)
@@ -94,7 +91,6 @@ app.get('/api/todos/:id', async (req, res) => {
             tasks: true
         },
     });
-
     if (!todo) {
         res.status(404).send({
             status: 404,
@@ -102,7 +98,6 @@ app.get('/api/todos/:id', async (req, res) => {
             data: null
         });
     }
-
     res.status(200).send({
         status: 200,
         message: "Success: Todo retrieved.",
@@ -121,7 +116,6 @@ app.get('/api/todos/:id', async (req, res) => {
 app.put('/api/todos/:id', async (req, res) => {
     const { id } = req.params;
     const { title, description } = req.body;
-    
     const todo = await db.todoList.update({
         where: {
             id: parseInt(id)
@@ -140,7 +134,6 @@ app.put('/api/todos/:id', async (req, res) => {
             tasks: true
         },
     });
-
     if (!todo) {
         res.status(404).send({
             status: 404,
@@ -148,7 +141,6 @@ app.put('/api/todos/:id', async (req, res) => {
             data: null
         });
     }
-    
     res.status(200).send({
         status: 200,
         message: "Success: Todo updated.",
@@ -166,13 +158,11 @@ app.put('/api/todos/:id', async (req, res) => {
 // delete todo
 app.delete('/api/todos/:id', async (req, res) => {
     const { id } = req.params;
-
     const tasks = await db.task.deleteMany({
         where: {
             todoListId: parseInt(id)
         }
     });
-
     const todo = await db.todoList.delete({
         where: {
             id: parseInt(id)
@@ -181,7 +171,6 @@ app.delete('/api/todos/:id', async (req, res) => {
             tasks: true
         }
     });
-
     if (!todo) {
         res.status(404).send({
             status: 404,
@@ -189,7 +178,6 @@ app.delete('/api/todos/:id', async (req, res) => {
             data: null
         });
     }
-
     res.status(200).send({
         status: 200,
         message: "Success: Todo deleted.",
@@ -197,18 +185,16 @@ app.delete('/api/todos/:id', async (req, res) => {
     });
 });
 
-// task
+// create task
 app.post('/api/todos/:id/tasks', async (req, res) => {
     const { id } = req.params;
     const { title } = req.body;
-
     const task = await db.task.create({
         data: {
             name: title,
             todoListId: parseInt(id)
         }
     });
-
     res.status(200).send({
         status: 200,
         message: "Success: Task created.",
@@ -219,7 +205,6 @@ app.post('/api/todos/:id/tasks', async (req, res) => {
 // update task
 app.patch('/api/todos/:id/tasks/:taskId', async (req, res) => {
     const { id, taskId } = req.params;
-
     const taskCompleted = await db.task.findFirst({
         where: {
             id: parseInt(taskId),
@@ -229,7 +214,6 @@ app.patch('/api/todos/:id/tasks/:taskId', async (req, res) => {
             isCompleted: true
         }
     });
-
     if (!taskCompleted) {
         res.status(404).send({
             status: 404,
@@ -237,7 +221,6 @@ app.patch('/api/todos/:id/tasks/:taskId', async (req, res) => {
             data: null
         });
     }
-
     const task = await db.task.update({
         where: {
             id: parseInt(taskId)
@@ -246,7 +229,6 @@ app.patch('/api/todos/:id/tasks/:taskId', async (req, res) => {
             isCompleted: !taskCompleted.isCompleted
         }
     });
-
     res.status(200).send({
         status: 200,
         message: "Success: Task updated.",
@@ -257,14 +239,12 @@ app.patch('/api/todos/:id/tasks/:taskId', async (req, res) => {
 // delete task
 app.delete('/api/todos/:id/tasks/:taskId', async (req, res) => {
     const { id, taskId } = req.params;
-
     const task = await db.task.delete({
         where: {
             id: parseInt(taskId),
             todoListId: parseInt(id)
         }
     });
-
     if (!task) {
         res.status(404).send({
             status: 404,
@@ -272,7 +252,6 @@ app.delete('/api/todos/:id/tasks/:taskId', async (req, res) => {
             data: null
         });
     }
-
     res.status(200).send({
         status: 200,
         message: "Success: Task deleted.",
@@ -280,10 +259,9 @@ app.delete('/api/todos/:id/tasks/:taskId', async (req, res) => {
     });
 });
 
-// category
+// get all category
 app.get('/api/category', async (req, res) => {
     const category = await db.category.findMany();
-
     res.status(200).send({
         status: 200,
         message: "Success: category retrieved.",
@@ -294,13 +272,11 @@ app.get('/api/category', async (req, res) => {
 // create category
 app.post('/api/category', async (req, res) => {
     const { name } = req.body;
-
     const category = await db.category.create({
         data: {
             name
         }
     });
-
     res.status(200).send({
         status: 200,
         message: "Success: Category created.",
@@ -311,7 +287,6 @@ app.post('/api/category', async (req, res) => {
 // get category by id
 app.get('/api/category/:id', async (req, res) => {
     const { id } = req.params;
-
     const category = await db.category.findUnique({
         where: {
             id: parseInt(id)
@@ -331,7 +306,6 @@ app.get('/api/category/:id', async (req, res) => {
             }
         },
     });
-
     if (!category) {
         res.status(404).send({
             status: 404,
@@ -339,7 +313,6 @@ app.get('/api/category/:id', async (req, res) => {
             data: null
         });
     }
-
     res.status(200).send({
         status: 200,
         message: "Success: Category retrieved.",
@@ -363,7 +336,6 @@ app.post('/api/category/:id', async (req, res) => {
     // insert todo to category
     const { id } = req.params;
     const { title, description } = req.body;
-
     const todo = await db.todoList.create({
         data: {
             title,
@@ -383,7 +355,6 @@ app.post('/api/category/:id', async (req, res) => {
             }
         }
     });
-
     if (!todo) {
         res.status(404).send({
             status: 404,
@@ -391,7 +362,6 @@ app.post('/api/category/:id', async (req, res) => {
             data: null
         });
     }
-
     res.status(200).send({
         status: 200,
         message: "Success: Todo created.",
@@ -404,13 +374,11 @@ app.put('/api/category/:id', async (req, res) => {
     // insert todo to category
     const { id } = req.params;
     const { todoId } = req.body;
-
     const todo = await db.todoList.findUnique({
         where: {
             id: parseInt(todoId)
         }
     });
-
     if (!todo) {
         res.status(404).send({
             status: 404,
@@ -418,7 +386,6 @@ app.put('/api/category/:id', async (req, res) => {
             data: null
         });
     }
-
     const category = await db.category.update({
         where: {
             id: parseInt(id)
@@ -431,7 +398,6 @@ app.put('/api/category/:id', async (req, res) => {
             }
         }
     });
-
     if (!category) {
         res.status(404).send({
             status: 404,
@@ -439,7 +405,6 @@ app.put('/api/category/:id', async (req, res) => {
             data: null
         });
     }
-
     res.status(200).send({
         status: 200,
         message: "Success: Category updated.",
@@ -451,7 +416,6 @@ app.put('/api/category/:id', async (req, res) => {
 app.patch('/api/category/:id', async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
-
     const category = await db.category.update({
         where: {
             id: parseInt(id)
@@ -460,7 +424,6 @@ app.patch('/api/category/:id', async (req, res) => {
             name
         }
     });
-
     if (!category) {
         res.status(404).send({
             status: 404,
@@ -468,7 +431,6 @@ app.patch('/api/category/:id', async (req, res) => {
             data: null
         });
     }
-
     res.status(200).send({
         status: 200,
         message: "Success: Category updated.",
@@ -479,13 +441,11 @@ app.patch('/api/category/:id', async (req, res) => {
 // delete category
 app.delete('/api/category/:id', async (req, res) => {
     const { id } = req.params;
-
     const category = await db.category.delete({
         where: {
             id: parseInt(id)
         }
     });
-
     if (!category) {
         res.status(404).send({
             status: 404,
@@ -493,7 +453,6 @@ app.delete('/api/category/:id', async (req, res) => {
             data: null
         });
     }
-
     res.status(200).send({
         status: 200,
         message: "Success: Category deleted.",
